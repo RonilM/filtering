@@ -1,4 +1,4 @@
-var ParticleFilter = function(data,nParticles) {
+var ParticleFilter = function(data,nParticles,start) {
 
 	//var data = [];
 	var particles = [];
@@ -29,7 +29,7 @@ var ParticleFilter = function(data,nParticles) {
 	}
 	
 	ParticleFilter.prototype.getActual = function() {
-		return actual;
+		return actualList[actualList.length-1];
 	}
 
 
@@ -147,7 +147,7 @@ var ParticleFilter = function(data,nParticles) {
 
 		updateProbabilityRanges(data);
 
-		actual = getCellFromProbability(Math.random());
+		actual = {'x': start.x, 'y': start.y};//getCellFromProbability(Math.random());
 		//actual = {'x':0,'y':0}
 		actualList.push(actual);
 

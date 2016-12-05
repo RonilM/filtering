@@ -257,7 +257,7 @@
 			actions = groundTruth.getAction();
 			observations = groundTruth.getSensor();
 
-			pf = new ParticleFilter(grid,10000);
+			pf = new ParticleFilter(grid,10000,start);
 			painter = new Painter("draw-div");
 			pfData = pf.getData();
 			//console.log(pfData);
@@ -265,8 +265,8 @@
 
 			
 
-			console.log(actions);
-			console.log(goal);
+			//console.log(actions);
+			//console.log(goal);
 			// var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight,weight2);
 			// finalPath = astar.getFinalPath();
 			// var memory = astar.getLength();
