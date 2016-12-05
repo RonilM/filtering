@@ -1,0 +1,464 @@
+<html>
+
+	<head>
+		<title>
+			
+		</title>
+	</head>
+
+	<body> 
+	
+	<!-- <div style="display:inline-flex;">
+		<p>g:&nbsp;</p>  <p id="g-val">0</p> 
+		<p>h:&nbsp;</p>  <p id="h-val">0</p> 
+		<p>f:&nbsp;</p>  <p id="f-val">0</p> 
+	</div>
+	 -->
+
+	<div id="grid-div" style="position:absolute;left:10px;top:40px;padding:5px;">
+		<br/>
+		<button onclick="generateInputMap();"> Generate Input Map </button>
+		<button onclick="downloadInputMap();"> Download Input Map </button>
+		<br/>
+		<br/>
+		<div>
+			<label>Start X:</label>	<input id="startX" type="text">	
+			<label>Start Y:</label>	<input id="startY" type="text">	
+			<label>Goal X:</label>	<input id="goalX" type="text">	
+			<label>Goal Y:</label>	<input id="goalY" type="text">	
+			<button onclick="generateEndpoints();">Generate Endpoints</button>
+		</div>
+		<br/>
+		<div style=""> <label> Heuristic:</label>  <input id="heuristic" type="text">	<p style="color:#607d8b">Euclidean,MaxCoordinate,Manhattan,Diagonal,EuclideanSquared</p></div>
+		<br/>
+		<div style=""> <label> Weight1:</label>  <input id="weight" type="text"></div>
+		<br/>
+		<br/>
+		<div style=""> <label> Weight2:</label>  <input id="weight2" type="text"></div>
+		<br/>
+		<label>Upload Input Map:</label><input onchange="uploadInputMap();" type="file" id="fileinput" />
+		<button onclick="runAlgo();">Run Algorithm</button>
+		<button onclick="downloadResult();">Download Result</button>
+		<button onclick="runAlgoFast();">Run Algo in Console</button>
+		<br/>
+		<br/>
+		<br/>
+	</div>
+
+	
+	</body>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script type="text/javascript" src="scripts/priority-queue.js"></script>
+	<script type="text/javascript" src="scripts/blocks.js"></script>
+	<script type="text/javascript" src="scripts/random.js"></script>
+	<script type="text/javascript" src="scripts/atsar.js"></script>
+	<script type="text/javascript" src="scripts/groundTruth.js"></script>
+	
+	<script>
+
+		var _rows = 120;
+		var _cols = 160;
+		var start,goal;
+		var str = "";
+		var min = 1;
+		var max = 5;
+		var groundTruth;
+		var map;
+		var board;
+		var random;
+		var finalPath = [];
+		var finPathStr;
+		random = new Random(_rows,_cols);
+		
+		var heuristicNameArray = ['Diagonal','Euclidean','MaxCoordinate','Manhattan','EuclideanSquared'];
+		var heuristicFunction = {
+			'Euclidean' : function (x,y,goalx,goaly) {
+				var dX = Math.abs(x - goalx);
+				var dY = Math.abs(y - goaly);
+				
+				var retVal = dX*dX + dY*dY;
+
+				return Math.sqrt(retVal);
+			},
+
+			'MaxCoordinate' : function(x,y,goalx,goaly) {
+				var dX = Math.abs(x - goalx);
+				var dY = Math.abs(y - goaly);
+
+				return Math.max(dX,dY);
+			},
+			'Manhattan' : function(x,y,goalx,goaly) {
+				var dX = Math.abs(x - goalx);
+				var dY = Math.abs(y - goaly);
+				return dX + dY;
+			},
+			'Diagonal' : function(x,y,goalx,goaly) {
+				var dX = Math.abs(x - goalx);
+				var dY = Math.abs(y - goaly);
+				var diagCost;
+				var retVal = 0;
+				if(dX > dY) {
+					diagCost = Math.sqrt(2)*dY;
+				}
+				else {
+					diagCost = Math.sqrt(2)*dX;
+				}
+				var hvCost = (Math.abs(dX - dY));
+				retVal = diagCost + hvCost;
+				//console.log(hvCost);
+				return retVal*0.25;
+			},
+
+			'EuclideanSquared' : function (x,y,goalx,goaly) {
+				var dX = Math.abs(x - goalx);
+				var dY = Math.abs(y - goaly);
+				
+				var retVal = dX*dX + dY*dY;
+
+				return retVal;
+			}
+
+		};
+
+		function generateEndpoints() {
+			var arr = random.getRandomEndPoints();
+			document.getElementById('startX').value = arr[0].x;
+			document.getElementById('startY').value = arr[0].y;
+			document.getElementById('goalX').value = arr[1].x;
+			document.getElementById('goalY').value = arr[1].y;
+		}
+		
+
+		function generateInputMap() {
+			random = new Random(_rows,_cols);
+			map = random.getMap();
+			str = getCSVFormat(map,_rows,_cols);
+			alert("Generated");
+		} 
+
+		function downloadInputMap() {
+			download('Map'+Math.floor(Math.random()*100)+'.txt', str);
+		}
+
+		function uploadInputMap() {
+			var file = document.getElementById("fileinput").files[0];
+			if (file) {
+			    var reader = new FileReader();
+			    reader.readAsText(file, "UTF-8");
+			    reader.onload = function (evt) {
+			        str = evt.target.result;
+			        console.log("Changed");
+			    }
+			    reader.onerror = function (evt) {
+			    	console.log(evt);
+			        alert("Check File!");
+			    }
+			}
+		}
+
+		function runAlgoFast() {
+			console.log("*************************************************************");
+			var ele = document.getElementById("map-svg");
+			if(ele != null){
+				ele.remove();
+			}
+			var _retArr = parseCSVFormat(str);
+			map = _retArr[2];
+			_rows = _retArr[0];
+			_cols = _retArr[1];
+
+
+
+			if(document.getElementById('startX').value != '' && document.getElementById('startY').value != '' && document.getElementById('goalX').value != '' &&  document.getElementById('goalY').value != '') {
+				start = {'x':parseInt(document.getElementById('startX').value), 'y':parseInt(document.getElementById('startY').value) };
+				goal = {'x':parseInt(document.getElementById('goalX').value), 'y':parseInt(document.getElementById('goalY').value) };
+			} 
+			else {
+				alert("Please provide endpoints!");
+				return;
+			}
+			var tuple = "";
+			console.log("Start: ("+start.x+","+start.y+")");
+			console.log("Goal: ("+goal.x+","+goal.y+")");
+			console.log("\n");
+			var weightVals = [1.25,2.0];
+
+			for(var wv in weightVals) {
+				for(var wv2 in weightVals) {
+					//avgrt, nodes_expanded, f, g, h, mem, avg.r pt. 
+					//var heuristicFunction = heuristicFn[hrt];
+					var weight = weightVals[wv];
+					var weight2 = weightVals[wv2];
+					var partialObstacles = [];
+					var Obstacles = [];
+					var highways = {};
+					var PBhighways = {};
+					var blockedVar = [];
+					for(var i = 0; i < map.length ; i++) {
+						for(var j = 0 ; j < map[i].length ; j++) {
+							
+							var sVar = map[i][j];
+							var hNum;
+							if(typeof map[i][j] === 'string' && (map[i][j].includes("a") || map[i][j].includes("b"))) {
+								sVar = map[i][j].charAt(0);
+								hNum = map[i][j].charAt(1);
+							}
+
+						switch(sVar+"") {
+						case '0':
+						blockedVar.push([i,j]);
+						break;
+						case '2':
+						partialObstacles.push([i,j]);
+						break;
+						case 'a':
+						if(highways[hNum] == null) {
+						highways[hNum] = [];
+						}
+						highways[hNum].push([i,j]);
+						break;
+						case 'b':
+						if(PBhighways[hNum] == null) {
+						PBhighways[hNum] = [];
+						}
+						PBhighways[hNum].push([i,j]);
+						break;
+						}
+						}
+					}
+					//[[1,2],[3,3],[4,4]]
+					board = new Board('grid-div',_rows,_cols,partialObstacles,highways,PBhighways, blockedVar);
+					var grid = board.getGrid();
+					console.log(start);
+					console.log(goal);
+					console.log(heuristicFunction);
+					var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight,weight2);
+					finalPath = astar.getFinalPath();
+					var memory = astar.getLength();
+					var nodes = astar.getCountNodes();
+					finPathStr = "";
+					var finIdx;
+					for(var i in finalPath[0]) {
+						finPathStr += "("+(finalPath[0][i].x+1)+","+(finalPath[0][i].y+1)+")\n";
+						finIdx = i;
+					}
+					finPathStr = finalPath[0][finIdx].g+"\n"+finPathStr;
+					
+
+					tuple += ", W1="+weight+", W2="+weight2+",FP="+finalPath[0].length+","+finalPath[1]+","+nodes[0]+","+finalPath[0][finIdx].g+","+memory+"\n";
+
+					// tuple += ", W="+weight+",FP="+finalPath[0].length+","+finalPath[1]+","+astar.getCountNodes()+","+finalPath[0][finIdx].f+","+finalPath[0][finIdx].g+","+finalPath[0][finIdx].h+"\n";
+
+
+					ele = document.getElementById("map-svg");
+					if(ele != null){
+						ele.remove();
+					}
+				}
+			}
+			console.log(tuple);
+			console.log("*************************************************************\n\n");
+		}
+
+		function runAlgo() {
+			var ele = document.getElementById("map-svg");
+			if(ele != null){
+				ele.remove();
+			}
+			var _retArr = parseCSVFormat(str);
+			map = _retArr[2];
+			_rows = _retArr[0];
+			_cols = _retArr[1];
+
+
+
+			if(document.getElementById('startX').value != '' && document.getElementById('startY').value != '' && document.getElementById('goalX').value != '' &&  document.getElementById('goalY').value != '') {
+				start = {'x':parseInt(document.getElementById('startX').value), 'y':parseInt(document.getElementById('startY').value) };
+				goal = {'x':parseInt(document.getElementById('goalX').value), 'y':parseInt(document.getElementById('goalY').value) };
+			} 
+			else {
+				alert("Please provide endpoints!");
+				return;
+			}
+
+			//var heuristicFunction = heuristicFn[document.getElementById('heuristic').value];
+			if(heuristicFunction == null) {
+				alert("Enter Correct Heuristic");
+				return;
+			}
+
+			var weightStr = document.getElementById('weight').value;
+			if(weightStr == '' || weightStr == null) {
+				alert("Enter Correct Weight");
+				return;
+			}
+
+			var weightStr2 = document.getElementById('weight2').value;
+			if(weightStr2 == '' || weightStr2 == null) {
+				alert("Enter Correct Weight2");
+				return;
+			}
+
+			var weight = parseFloat(weightStr);
+			var weight2 = parseFloat(weightStr2);
+
+			//random = new Random(_rows,_cols);
+			//start = random.getStartPoint();
+			//goal = random.getEndPoint();
+
+			var partialObstacles = [];
+			var Obstacles = [];
+			var highways = {};
+			var PBhighways = {};
+			var blockedVar = [];
+			for(var i = 0; i < map.length ; i++) {
+				for(var j = 0 ; j < map[i].length ; j++) {
+					
+					var sVar = map[i][j];
+					var hNum;
+					if(typeof map[i][j] === 'string' && (map[i][j].includes("a") || map[i][j].includes("b"))) {
+						sVar = map[i][j].charAt(0);
+						hNum = map[i][j].charAt(1);
+					}
+
+				switch(sVar+"") {
+				case '0':
+				blockedVar.push([i,j]);
+				break;
+				case '2':
+				partialObstacles.push([i,j]);
+				break;
+				case 'a':
+				if(highways[hNum] == null) {
+				highways[hNum] = [];
+				}
+				highways[hNum].push([i,j]);
+				break;
+				case 'b':
+				if(PBhighways[hNum] == null) {
+				PBhighways[hNum] = [];
+				}
+				PBhighways[hNum].push([i,j]);
+				break;
+				}
+				}
+			}
+			//[[1,2],[3,3],[4,4]]
+			board = new Board('grid-div',_rows,_cols,partialObstacles,highways,PBhighways, blockedVar);
+			
+			var grid = board.getGrid();
+			// Ground Truth Values
+
+			groundTruth = new GroundTruth(min,max,grid,start);
+			var agentMoveX = groundTruth.getTransitionX();
+			var agentMoveY = groundTruth.getTransitionY();
+			var actions = groundTruth.getAction();
+			var observations = groundTruth.getSensor();
+
+			
+			console.log(start);
+			console.log(goal);
+			var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight,weight2);
+			finalPath = astar.getFinalPath();
+			var memory = astar.getLength();
+			//finalPath = astar.getFinalPath();
+			console.log(finalPath);
+			finPathStr = "";
+			var finIdx;
+			for(var i in finalPath[0]) {
+				finPathStr += "("+(finalPath[0][i].x+1)+","+(finalPath[0][i].y+1)+")\n";
+				finIdx = i;
+			}
+			finPathStr = finalPath[0][finIdx].g+"\n"+finPathStr;
+			board.addPath(finalPath[0]);
+		}
+
+		function downloadResult() {
+			download('Result'+Math.floor(Math.random()*100)+'.txt', finPathStr);
+		}
+		
+		//download('test.txt',str);
+
+		function download(filename, text) {
+  			var element = document.createElement('a');
+  			element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  			element.setAttribute('download', filename);
+
+  			element.style.display = 'none';
+  			document.body.appendChild(element);
+
+  			element.click();
+
+  			document.body.removeChild(element);
+		}
+
+		
+
+		function getCSVFormat(grid,rows,columns) {
+			console.log("c = " + columns);
+			var retVal = "";
+			retVal += rows+","+columns+"\n";
+			for(var i in grid) {
+				for(var j in grid[i]) {
+					if(j == columns - 1) {
+						retVal += grid[i][j];
+					}
+					else {
+						retVal += grid[i][j] + ",";
+					}
+				}
+				retVal += "\n";
+			}
+
+			return retVal;
+		}
+
+		function parseCSVFormat(str) {
+			var arr = str.split("\n");
+			var retVal = [];
+			var temp = arr[0].split(",");
+			retVal.push(temp[0]);
+			retVal.push(temp[1]);
+			var grid = [];
+			retVal.push(grid);
+
+			for(var i = 1 ; i < arr.length ; i++) {
+				var lineArr = arr[i].split(",");
+				for(var j = 0 ; j < lineArr.length ; j++) {
+					if(grid[i-1] == null) {
+						grid[i-1] = [];
+					}
+					grid[i-1][j] = lineArr[j]
+				}
+			}
+			return retVal;
+
+		}
+
+
+		
+
+	</script>
+
+	<style type="text/css">
+		.final-path {
+			pointer-events: all;
+			cursor: pointer;
+		}
+
+		.final-path:hover {
+			fill: red!important;
+		}
+
+
+		form * {
+  			display: block;
+ 			margin: 10px;
+		}
+
+
+
+	</style>
+
+</html>
