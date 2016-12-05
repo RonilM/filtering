@@ -11,6 +11,7 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 	var terrainObservations = []
 	init();
 
+
 	GroundTruth.prototype.getTransitionX = function() {
 		return transitionX;
 	}

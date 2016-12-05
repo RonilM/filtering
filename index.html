@@ -16,7 +16,8 @@
 	 -->
 
 	<div id="grid-div" style="position:absolute;left:10px;top:40px;padding:5px;">
-		<br/>
+		<div id="draw-div" style="position:relative;left:10px;top:40px;padding:5px;"></div>
+		
 		<button onclick="generateInputMap();"> Generate Input Map </button>
 		<button onclick="downloadInputMap();"> Download Input Map </button>
 		<br/>
@@ -39,6 +40,7 @@
 		<label>Upload Input Map:</label><input onchange="uploadInputMap();" type="file" id="fileinput" />
 		<button onclick="runAlgo();">Run Algorithm</button>
 		<button onclick="downloadResult();">Download Result</button>
+		<button onclick="nextIteration();">Next iteration</button>
 		<!-- <button onclick="runAlgoFast();">Run Algo in Console</button> -->
 		<br/>
 		<br/>
@@ -54,16 +56,19 @@
 	<script type="text/javascript" src="scripts/random.js"></script>
 	<!-- <script type="text/javascript" src="scripts/atsar.js"></script> -->
 	<script type="text/javascript" src="scripts/groundTruth.js"></script>
+	<script type="text/javascript" src="scripts/particleFilter.js"></script>
+	<script type="text/javascript" src="scripts/painter.js"></script>
+	<script type="text/javascript" src="scripts/viterbi.js"></script>
 	
 	<script>
 
-		var _rows = 120;
-		var _cols = 160;
+		var _rows = 12;
+		var _cols = 16;
 		var start,goal;
 		var str = "";
 		var min = 1;
 		var max = 5;
-		var groundTruth;
+		var groundTruth,actions,observations,pf,painter,pfData;
 		var map;
 		var board;
 		var random;
@@ -245,16 +250,21 @@
 			
 			var grid = board.getGrid();
 			// Ground Truth Values
-
+			console.log(grid);
 			groundTruth = new GroundTruth(min,max,grid,start);
 			var agentMoveX = groundTruth.getTransitionX();
 			var agentMoveY = groundTruth.getTransitionY();
-			var actions = groundTruth.getAction();
-			var observations = groundTruth.getSensor();
+			actions = groundTruth.getAction();
+			observations = groundTruth.getSensor();
+
+			pf = new ParticleFilter(grid,10);
+			painter = new Painter("draw-div");
+			pfData = pf.getData();
+			console.log(pfData);
+			painter.drawCanvas(pfData,2,2);
 
 			
-			
-			
+
 			console.log(start);
 			console.log(goal);
 			// var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight,weight2);
@@ -274,6 +284,18 @@
 
 		function downloadResult() {
 			download('Result'+Math.floor(Math.random()*100)+'.txt', finPathStr);
+		}
+
+		var idx = 0;
+			
+		function nextIteration() {
+			for(var i = 0 ; i < 100 ; i++) {
+				pf.nextIteration(actions[idx],observations);
+				idx++;
+				painter.drawCanvas(pf.getData(),2,2);
+				//console.log(pf.getActual());
+			}
+
 		}
 		
 		//download('test.txt',str);
