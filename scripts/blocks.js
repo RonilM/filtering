@@ -23,7 +23,7 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 	var canvas;
 	var boxWidth = 5;
 	var boxHeight = 5;
-	var boxStore = {};
+	var boxStore = [];
 
 	var boxColor = '#FFFFFF';
 	var obstacleColor = '#966f6f';
@@ -67,7 +67,7 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 		svg.setAttribute("id",'map-svg');
 		svg.setAttribute("width",columnCount*boxWidth*2);
 		svg.setAttribute("height", rowCount*boxHeight*2);
-		canvas.appendChild(svg);
+		//canvas.appendChild(svg);
 
 		for(var i=0;i<rowCount;i++) {
 			for(var j=0; j<columnCount ;j++){
@@ -80,10 +80,10 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 		        rect.setAttributeNS(null, 'height', boxHeight);
 		        rect.setAttributeNS(null, 'style', 'fill:#FFFFFF;stroke-width:1;stroke:#CCC');
 		        if(boxStore[i] == null) {
-		        	boxStore[i] = {};
+		        	boxStore[i] = [];
 		        }
 		        boxStore[i][j] = {'DOMElement':rect , 'Code':'1', 'x':i,'y':j};
-				svg.appendChild(rect);
+				//svg.appendChild(rect);
 
 			}
 		}
@@ -197,6 +197,7 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 		boxStore[x][y].isPartialObstacle = true;
 		boxStore[x][y].Code = value+"";
 		DomElement.setAttributeNS(null, 'style', 'fill:'+obstacleColor+';stroke-width:1;stroke:#CCC');
+		boxStore[x][y].color = obstacleColor;
 
 	}
 
@@ -209,6 +210,7 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 		boxStore[x][y].isBlocked = true;
 		boxStore[x][y].Code = '0';
 		DomElement.setAttributeNS(null, 'style', 'fill:'+blockedColor+';stroke-width:1;stroke:#CCC');
+		boxStore[x][y].color = blockedColor;
 
 	}
 
@@ -221,6 +223,7 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 		boxStore[x][y].isHighway = true;
 		boxStore[x][y].Code = highwayNumber;
 		DomElement.setAttributeNS(null, 'style', 'fill:'+highwayColor+';stroke-width:1;stroke:#CCC');
+		boxStore[x][y].color = highwayColor;
 
 	}
 
@@ -233,6 +236,7 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 		boxStore[x][y].isPBHighway = true;
 		boxStore[x][y].Code = highwayNumber;
 		DomElement.setAttributeNS(null, 'style', 'fill:'+PBHighwayColor+';stroke-width:1;stroke:#CCC');
+		boxStore[x][y].color = PBHighwayColor;
 
 	}
 
