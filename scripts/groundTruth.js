@@ -56,8 +56,8 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 		// observation model
 
 		for (var j = 0; j < 100; j++){
-			//terrainObservations[j] = getObservation(transitionX[j],transitionY[j]);
-			grid[transitionX[j]][transitionY[j]].Type = getObservation(transitionX[j],transitionY[j]);
+			terrainObservations[j] = getObservation(transitionX[j],transitionY[j]);
+			//grid[transitionX[j]][transitionY[j]].Type = getObservation(transitionX[j],transitionY[j]);
 			//console.log(grid[transitionX[j]][transitionY[j]]);
 		}
 

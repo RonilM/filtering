@@ -198,6 +198,7 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 		boxStore[x][y].Code = value+"";
 		DomElement.setAttributeNS(null, 'style', 'fill:'+obstacleColor+';stroke-width:1;stroke:#CCC');
 		boxStore[x][y].color = obstacleColor;
+		boxStore[x][y].type = 'PB'; 
 
 	}
 
@@ -211,6 +212,7 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 		boxStore[x][y].Code = '0';
 		DomElement.setAttributeNS(null, 'style', 'fill:'+blockedColor+';stroke-width:1;stroke:#CCC');
 		boxStore[x][y].color = blockedColor;
+		boxStore[x][y].type = 'B';
 
 	}
 
@@ -224,6 +226,7 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 		boxStore[x][y].Code = highwayNumber;
 		DomElement.setAttributeNS(null, 'style', 'fill:'+highwayColor+';stroke-width:1;stroke:#CCC');
 		boxStore[x][y].color = highwayColor;
+		boxStore[x][y].type = 'H';
 
 	}
 
