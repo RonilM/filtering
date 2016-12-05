@@ -11,19 +11,19 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 	var terrainObservations = []
 	init();
 
-	GroundTruth.Prototype.getTransitionX = function() {
+	GroundTruth.prototype.getTransitionX = function() {
 		return transitionX;
 	}
 
-	GroundTruth.Prototype.getTransitionY = function() {
+	GroundTruth.prototype.getTransitionY = function() {
 		return transitionY;
 	}
 
-	GroundTruth.Prototype.getAcion = function() {
+	GroundTruth.prototype.getAction = function() {
 		return action;
 	}
 
-	GroundTruth.Prototype.getSensor = function() {
+	GroundTruth.prototype.getSensor = function() {
 		return terrainObservations;
 	}
 

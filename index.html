@@ -29,17 +29,17 @@
 			<button onclick="generateEndpoints();">Generate Endpoints</button>
 		</div>
 		<br/>
-		<div style=""> <label> Heuristic:</label>  <input id="heuristic" type="text">	<p style="color:#607d8b">Euclidean,MaxCoordinate,Manhattan,Diagonal,EuclideanSquared</p></div>
+		<!-- <div style=""> <label> Heuristic:</label>  <input id="heuristic" type="text">	<p style="color:#607d8b">Euclidean,MaxCoordinate,Manhattan,Diagonal,EuclideanSquared</p></div>
 		<br/>
 		<div style=""> <label> Weight1:</label>  <input id="weight" type="text"></div>
 		<br/>
 		<br/>
 		<div style=""> <label> Weight2:</label>  <input id="weight2" type="text"></div>
-		<br/>
+		<br/> -->
 		<label>Upload Input Map:</label><input onchange="uploadInputMap();" type="file" id="fileinput" />
 		<button onclick="runAlgo();">Run Algorithm</button>
 		<button onclick="downloadResult();">Download Result</button>
-		<button onclick="runAlgoFast();">Run Algo in Console</button>
+		<!-- <button onclick="runAlgoFast();">Run Algo in Console</button> -->
 		<br/>
 		<br/>
 		<br/>
@@ -49,10 +49,10 @@
 	</body>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-	<script type="text/javascript" src="scripts/priority-queue.js"></script>
+	<!-- <script type="text/javascript" src="scripts/priority-queue.js"></script> -->
 	<script type="text/javascript" src="scripts/blocks.js"></script>
 	<script type="text/javascript" src="scripts/random.js"></script>
-	<script type="text/javascript" src="scripts/atsar.js"></script>
+	<!-- <script type="text/javascript" src="scripts/atsar.js"></script> -->
 	<script type="text/javascript" src="scripts/groundTruth.js"></script>
 	
 	<script>
@@ -157,119 +157,15 @@
 			}
 		}
 
-		function runAlgoFast() {
-			console.log("*************************************************************");
-			var ele = document.getElementById("map-svg");
-			if(ele != null){
-				ele.remove();
-			}
-			var _retArr = parseCSVFormat(str);
-			map = _retArr[2];
-			_rows = _retArr[0];
-			_cols = _retArr[1];
-
-
-
-			if(document.getElementById('startX').value != '' && document.getElementById('startY').value != '' && document.getElementById('goalX').value != '' &&  document.getElementById('goalY').value != '') {
-				start = {'x':parseInt(document.getElementById('startX').value), 'y':parseInt(document.getElementById('startY').value) };
-				goal = {'x':parseInt(document.getElementById('goalX').value), 'y':parseInt(document.getElementById('goalY').value) };
-			} 
-			else {
-				alert("Please provide endpoints!");
-				return;
-			}
-			var tuple = "";
-			console.log("Start: ("+start.x+","+start.y+")");
-			console.log("Goal: ("+goal.x+","+goal.y+")");
-			console.log("\n");
-			var weightVals = [1.25,2.0];
-
-			for(var wv in weightVals) {
-				for(var wv2 in weightVals) {
-					//avgrt, nodes_expanded, f, g, h, mem, avg.r pt. 
-					//var heuristicFunction = heuristicFn[hrt];
-					var weight = weightVals[wv];
-					var weight2 = weightVals[wv2];
-					var partialObstacles = [];
-					var Obstacles = [];
-					var highways = {};
-					var PBhighways = {};
-					var blockedVar = [];
-					for(var i = 0; i < map.length ; i++) {
-						for(var j = 0 ; j < map[i].length ; j++) {
-							
-							var sVar = map[i][j];
-							var hNum;
-							if(typeof map[i][j] === 'string' && (map[i][j].includes("a") || map[i][j].includes("b"))) {
-								sVar = map[i][j].charAt(0);
-								hNum = map[i][j].charAt(1);
-							}
-
-						switch(sVar+"") {
-						case '0':
-						blockedVar.push([i,j]);
-						break;
-						case '2':
-						partialObstacles.push([i,j]);
-						break;
-						case 'a':
-						if(highways[hNum] == null) {
-						highways[hNum] = [];
-						}
-						highways[hNum].push([i,j]);
-						break;
-						case 'b':
-						if(PBhighways[hNum] == null) {
-						PBhighways[hNum] = [];
-						}
-						PBhighways[hNum].push([i,j]);
-						break;
-						}
-						}
-					}
-					//[[1,2],[3,3],[4,4]]
-					board = new Board('grid-div',_rows,_cols,partialObstacles,highways,PBhighways, blockedVar);
-					var grid = board.getGrid();
-					console.log(start);
-					console.log(goal);
-					console.log(heuristicFunction);
-					var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight,weight2);
-					finalPath = astar.getFinalPath();
-					var memory = astar.getLength();
-					var nodes = astar.getCountNodes();
-					finPathStr = "";
-					var finIdx;
-					for(var i in finalPath[0]) {
-						finPathStr += "("+(finalPath[0][i].x+1)+","+(finalPath[0][i].y+1)+")\n";
-						finIdx = i;
-					}
-					finPathStr = finalPath[0][finIdx].g+"\n"+finPathStr;
-					
-
-					tuple += ", W1="+weight+", W2="+weight2+",FP="+finalPath[0].length+","+finalPath[1]+","+nodes[0]+","+finalPath[0][finIdx].g+","+memory+"\n";
-
-					// tuple += ", W="+weight+",FP="+finalPath[0].length+","+finalPath[1]+","+astar.getCountNodes()+","+finalPath[0][finIdx].f+","+finalPath[0][finIdx].g+","+finalPath[0][finIdx].h+"\n";
-
-
-					ele = document.getElementById("map-svg");
-					if(ele != null){
-						ele.remove();
-					}
-				}
-			}
-			console.log(tuple);
-			console.log("*************************************************************\n\n");
-		}
-
 		function runAlgo() {
-			var ele = document.getElementById("map-svg");
-			if(ele != null){
-				ele.remove();
-			}
-			var _retArr = parseCSVFormat(str);
-			map = _retArr[2];
-			_rows = _retArr[0];
-			_cols = _retArr[1];
+			// var ele = document.getElementById("map-svg");
+			// if(ele != null){
+			// 	ele.remove();
+			// }
+			// var _retArr = parseCSVFormat(str);
+			// map = _retArr[2];
+			// _rows = _retArr[0];
+			// _cols = _retArr[1];
 
 
 
@@ -283,25 +179,25 @@
 			}
 
 			//var heuristicFunction = heuristicFn[document.getElementById('heuristic').value];
-			if(heuristicFunction == null) {
-				alert("Enter Correct Heuristic");
-				return;
-			}
+			// if(heuristicFunction == null) {
+			// 	alert("Enter Correct Heuristic");
+			// 	return;
+			// }
 
-			var weightStr = document.getElementById('weight').value;
-			if(weightStr == '' || weightStr == null) {
-				alert("Enter Correct Weight");
-				return;
-			}
+			// var weightStr = document.getElementById('weight').value;
+			// if(weightStr == '' || weightStr == null) {
+			// 	alert("Enter Correct Weight");
+			// 	return;
+			// }
 
-			var weightStr2 = document.getElementById('weight2').value;
-			if(weightStr2 == '' || weightStr2 == null) {
-				alert("Enter Correct Weight2");
-				return;
-			}
+			// var weightStr2 = document.getElementById('weight2').value;
+			// if(weightStr2 == '' || weightStr2 == null) {
+			// 	alert("Enter Correct Weight2");
+			// 	return;
+			// }
 
-			var weight = parseFloat(weightStr);
-			var weight2 = parseFloat(weightStr2);
+			// var weight = parseFloat(weightStr);
+			// var weight2 = parseFloat(weightStr2);
 
 			//random = new Random(_rows,_cols);
 			//start = random.getStartPoint();
@@ -359,19 +255,19 @@
 			
 			console.log(start);
 			console.log(goal);
-			var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight,weight2);
-			finalPath = astar.getFinalPath();
-			var memory = astar.getLength();
-			//finalPath = astar.getFinalPath();
-			console.log(finalPath);
-			finPathStr = "";
-			var finIdx;
-			for(var i in finalPath[0]) {
-				finPathStr += "("+(finalPath[0][i].x+1)+","+(finalPath[0][i].y+1)+")\n";
-				finIdx = i;
-			}
-			finPathStr = finalPath[0][finIdx].g+"\n"+finPathStr;
-			board.addPath(finalPath[0]);
+			// var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight,weight2);
+			// finalPath = astar.getFinalPath();
+			// var memory = astar.getLength();
+			// //finalPath = astar.getFinalPath();
+			// console.log(finalPath);
+			// finPathStr = "";
+			// var finIdx;
+			// for(var i in finalPath[0]) {
+			// 	finPathStr += "("+(finalPath[0][i].x+1)+","+(finalPath[0][i].y+1)+")\n";
+			// 	finIdx = i;
+			// }
+			// finPathStr = finalPath[0][finIdx].g+"\n"+finPathStr;
+			// board.addPath(finalPath[0]);
 		}
 
 		function downloadResult() {
