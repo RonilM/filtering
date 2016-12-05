@@ -62,8 +62,8 @@
 	
 	<script>
 
-		var _rows = 12;
-		var _cols = 16;
+		var _rows = 120;
+		var _cols = 160;
 		var start,goal;
 		var str = "";
 		var min = 1;
@@ -289,13 +289,13 @@
 		var idx = 0;
 			
 		function nextIteration() {
-			for(var i = 0 ; i < 100 ; i++) {
+			for(var i = 0 ; i < 10 ; i++) {
 				pf.nextIteration(actions[idx],observations);
 				idx++;
 				painter.drawCanvas(pf.getData(),2,2);
 				//console.log(pf.getActual());
 			}
-
+			alert("done");
 		}
 		
 		//download('test.txt',str);

@@ -26,13 +26,13 @@ var Painter = function(canvasID) {
 				var x = j*cellWidth;
 				var _color;
 				var prob = data[i][j].prob;
-				if(prob > 0.75) {
+				if(prob > 0.2) {
 					_color = "ff0000";
 				}
-				else if(prob > 0.5) {
+				else if(prob > 0.02) {
 					_color = "ff4c4c";	
 				}
-				else if(prob > 0.25) {
+				else if(prob > 0.002) {
 					_color = "ff9999";
 				}
 				else {
