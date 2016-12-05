@@ -28,7 +28,7 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 	}
 
 	function init() {
-		var actions = ['U','L','D','R'];
+		var actions = ['Up','Left','Down','Right'];
 		while (i < 100) {
 			num[i] = getRandomArbitrary(minimum,maximum);
 			action[i] = actions[num[i] - 1];
@@ -67,7 +67,7 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 		xy[1] = y;
 
 		switch(direction) {
-			case 'D':
+			case 'Down':
 				if (x != 119 ){
 					x = x + 1;
 				}
@@ -77,7 +77,7 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 				xy[0] = x;
 				xy[1] = y;
 				break;
-			case 'U':
+			case 'Up':
 				if(x != 0 ){
 					x = x - 1;
 				}
@@ -87,7 +87,7 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 				xy[0] = x;
 				xy[1] = y;
 				break;
-			case 'R':
+			case 'Right':
 				if(y != 159 ){
 					y = y + 1;
 				}
@@ -97,7 +97,7 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 				xy[0] = x;
 				xy[1] = y;
 				break;
-			case 'L':
+			case 'Left':
 				if(y != 0 ){
 					y = y - 1;
 				}
