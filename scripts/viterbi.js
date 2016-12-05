@@ -1,9 +1,9 @@
-var Viterbi = function(gridData) {
+var Viterbi = function(gridData,inputs) {
 
 
 	var data = [];
 	var timeData = [];
-	var inputs = [{"action": "RIGHT","observation": "N"},{"action": "RIGHT","observation": "N"},{"action": "DOWN","observation": "H"},{"action": "DOWN","observation": "H"}];
+	//var inputs = [{"action": "RIGHT","observation": "N"},{"action": "RIGHT","observation": "N"},{"action": "DOWN","observation": "H"},{"action": "DOWN","observation": "H"}];
 	var result;
 	init();
 
@@ -94,10 +94,10 @@ var Viterbi = function(gridData) {
 				data[i][j].x = i;
 				data[i][j].y = j;
 
-				data[i][j].type = getCellType(gridData[i][j]);
-				data[i][j].color = getCellcolor(gridData[i][j]);
+				data[i][j].type = gridData[i][j].type;
+				//data[i][j].color = getCellcolor(gridData[i][j]);
 				data[i][j].prob = 0;
-				if(gridData[i][j] != 'B'){
+				if(gridData[i][j].type != 'B'){
 					totalSpots++;
 				}
 
@@ -106,7 +106,7 @@ var Viterbi = function(gridData) {
 
 		for(var i = 0 ; i < gridData.length ; i++) {
 			for(var j = 0; j < gridData[0].length ; j++) {
-				if(gridData[i][j] != 'B')
+				if(gridData[i][j].type != 'B')
 					data[i][j].prob = 1/totalSpots;
 			}
 		}

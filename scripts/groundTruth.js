@@ -71,7 +71,7 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 
 		switch(direction) {
 			case 'Down':
-				if (x != 79 ){
+				if (x != 59 ){
 					x = x + 1;
 				}
 				if(grid[x][y].isBlocked == true){
@@ -91,7 +91,7 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 				xy[1] = y;
 				break;
 			case 'Right':
-				if(y != 59 ){
+				if(y != 79 ){
 					y = y + 1;
 				}
 				if(grid[x][y].isBlocked == true){

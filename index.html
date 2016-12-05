@@ -15,7 +15,7 @@
 	</div>
 	 -->
 
-	<div id="grid-div" style="position:absolute;left:10px;top:4px;padding:5px;">
+	<div id="grid-div" style="position:relative;left:10px;top:4px;padding:5px;">
 		<div id="draw-div" style="position:relative;left:10px;top:4px;padding:0px;"></div>
 		<br/>
 		<button onclick="generateInputMap();"> Generate Input Map </button>
@@ -41,16 +41,19 @@
 		<button onclick="runAlgo();">Run Algorithm</button>
 		<button onclick="downloadResult();">Download Result</button>
 		<button onclick="nextIteration();">Next iteration</button>
+		<button onclick="runViterbi();">Run Viterbi</button>
+
 		<!-- <button onclick="runAlgoFast();">Run Algo in Console</button> -->
 		<br/>
 		<br/>
 		<br/>
 	</div>
-
+	<div id="chart" style="position:relative;"></div>
 	
 	</body>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	<!-- <script type="text/javascript" src="scripts/priority-queue.js"></script> -->
 	<script type="text/javascript" src="scripts/blocks.js"></script>
 	<script type="text/javascript" src="scripts/random.js"></script>
@@ -68,7 +71,7 @@
 		var str = "";
 		var min = 1;
 		var max = 5;
-		var groundTruth,actions,observations,pf,painter,pfData;
+		var groundTruth,actions,observations,pf,painter,pfData,grid;
 		var map;
 		var board;
 		var random;
@@ -248,7 +251,7 @@
 			//[[1,2],[3,3],[4,4]]
 			board = new Board('grid-div',_rows,_cols,partialObstacles,highways,PBhighways, blockedVar);
 			
-			var grid = board.getGrid();
+			grid = board.getGrid();
 			// Ground Truth Values
 			//console.log(grid);
 			groundTruth = new GroundTruth(min,max,grid,start);
@@ -257,7 +260,7 @@
 			actions = groundTruth.getAction();
 			observations = groundTruth.getSensor();
 
-			pf = new ParticleFilter(grid,10000,start);
+			pf = new ParticleFilter(grid,12000,start);
 			painter = new Painter("draw-div");
 			pfData = pf.getData();
 			//console.log(pfData);
@@ -290,16 +293,78 @@
 			
 		function nextIteration() {
 			//console.log(observations);
-			for(var i = 0 ; i < 25 ; i++) {
+			for(var i = 0 ; i < 50 ; i++) {
 				pf.nextIteration(actions[idx],observations[idx]);
 				idx++;
 				//painter.drawCanvas(pf.getData(),10,10,pf.getActual());
-				setTimeout(function(){ painter.drawCanvas(pf.getData(),4,4,pf.getActual()); }, 250*i);
+				//setTimeout(function(){ painter.drawCanvas(pf.getData(),6,6,pf.getActual()); }, 250*i);
 				//console.log(pf.getActual());
 				//console.log(pf.getActual());
 			}
+			painter.drawCanvas(pf.getData(),4,4,pf.getActual());
 			//alert("done");
 		}
+
+		var result;
+		function runViterbi() {
+			var inputs = [];
+			for(var a in actions) {
+				inputs.push({"action":actions[a],"observations":observations[a]});
+			}
+
+			var viterbi = new Viterbi(grid,inputs);
+			result = viterbi.start();
+			var actualList = pf.getActualList();
+			var actCell = actualList[actualList.length-1];
+			var results = [];
+
+			var startCell = result[result.length-1][actCell.x][actCell.y];
+			_cell = startCell;
+			console.log("ACTUAL PATH:");
+			printList(actualList);
+			results.push(_cell);
+			
+			for(var i = 99; i >= 0 ; i--) {
+				
+				if(_cell != null)
+					_cell = viterbi.getMaxCell(_cell);
+				if(_cell != null)
+					results.push(_cell);
+
+			}
+			results.reverse();
+
+			console.log("ESTIMATED PATH:");
+			printList(results);
+			chartify(actualList,results)
+		}
+
+		function printList(list) {
+			var printVal = "";
+			for(var l in list) {
+				printVal += "-> ("+list[l].x+","+list[l].y+")";
+			}
+			console.log(printVal);
+		}
+
+		function chartify(actual,result) {
+			var myDiv = document.getElementById("chart");
+
+			var data = {};
+			var x = [],
+				y = [];
+			for(var a in actual) {
+				var err = Math.abs(actual[a].x - result[a].x) + Math.abs(actual[a].y - result[a].y);
+				y.push(err);
+				x.push(a);
+			}
+			data.x = x;
+			data.y = y;
+			data.type = 'scatter';
+			var trace = [ data ];
+			Plotly.plot(myDiv,trace);
+		}
+
 		
 		//download('test.txt',str);
 
