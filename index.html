@@ -15,9 +15,9 @@
 	</div>
 	 -->
 
-	<div id="grid-div" style="position:absolute;left:10px;top:40px;padding:5px;">
-		<div id="draw-div" style="position:relative;left:10px;top:40px;padding:0px;"></div>
-		
+	<div id="grid-div" style="position:absolute;left:10px;top:4px;padding:5px;">
+		<div id="draw-div" style="position:relative;left:10px;top:4px;padding:0px;"></div>
+		<br/>
 		<button onclick="generateInputMap();"> Generate Input Map </button>
 		<button onclick="downloadInputMap();"> Download Input Map </button>
 		<br/>
@@ -62,7 +62,7 @@
 	
 	<script>
 
-		var _rows = 40;
+		var _rows = 80;
 		var _cols = 60;
 		var start,goal;
 		var str = "";
@@ -257,15 +257,15 @@
 			actions = groundTruth.getAction();
 			observations = groundTruth.getSensor();
 
-			pf = new ParticleFilter(grid,500);
+			pf = new ParticleFilter(grid,10000);
 			painter = new Painter("draw-div");
 			pfData = pf.getData();
 			//console.log(pfData);
-			painter.drawCanvas(pfData,10,10,pf.getActual());
+			painter.drawCanvas(pfData,4,4,pf.getActual());
 
 			
 
-			console.log(start);
+			console.log(actions);
 			console.log(goal);
 			// var astar = new Astar(grid,start,goal,heuristicFunction,heuristicNameArray,weight,weight2);
 			// finalPath = astar.getFinalPath();
@@ -290,11 +290,11 @@
 			
 		function nextIteration() {
 			//console.log(observations);
-			for(var i = 0 ; i < 5 ; i++) {
+			for(var i = 0 ; i < 25 ; i++) {
 				pf.nextIteration(actions[idx],observations[idx]);
 				idx++;
 				//painter.drawCanvas(pf.getData(),10,10,pf.getActual());
-				setTimeout(function(){ painter.drawCanvas(pf.getData(),10,10,pf.getActual()); }, 250*i);
+				setTimeout(function(){ painter.drawCanvas(pf.getData(),4,4,pf.getActual()); }, 250*i);
 				//console.log(pf.getActual());
 				//console.log(pf.getActual());
 			}
