@@ -58,7 +58,7 @@ var ParticleFilter = function(data,nParticles) {
 	}	
 	
 	ParticleFilter.prototype.weighSamplesUsingObservation = function (observation) {
-		console.log(observation);
+		//console.log(observation);
 		var observed = observation;
 		for(var i = 0; i  < nParticles ; i++) {
 			var particle = particles[i];
@@ -67,8 +67,7 @@ var ParticleFilter = function(data,nParticles) {
 			//alert(type+"!!")
 			if(type == observed) {
 				particle.weight = 0.9;
-				console.log("@#@$#@$#$");
-				alert(data[particle.cell.x][particle.cell.y].type);
+				//console.log("@#@$#@$#$");
 			}
 			else {
 				particle.weight = 0.05;	

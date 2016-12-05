@@ -27,7 +27,7 @@ var Painter = function(canvasID) {
 				var _color;
 				var prob = data[i][j].prob;
 				if(i == actual.x && j == actual.y) {
-					console.log(actual);
+					//console.log(actual);
 					_color = "0000ff";
 				}
 				else if(prob > 0.5) {
