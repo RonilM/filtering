@@ -16,7 +16,7 @@
 	 -->
 
 	<div id="grid-div" style="position:absolute;left:10px;top:40px;padding:5px;">
-		<div id="draw-div" style="position:relative;left:10px;top:40px;padding:5px;"></div>
+		<div id="draw-div" style="position:relative;left:10px;top:40px;padding:0px;"></div>
 		
 		<button onclick="generateInputMap();"> Generate Input Map </button>
 		<button onclick="downloadInputMap();"> Download Input Map </button>
@@ -62,8 +62,8 @@
 	
 	<script>
 
-		var _rows = 120;
-		var _cols = 160;
+		var _rows = 40;
+		var _cols = 60;
 		var start,goal;
 		var str = "";
 		var min = 1;
@@ -250,18 +250,18 @@
 			
 			var grid = board.getGrid();
 			// Ground Truth Values
-			console.log(grid);
+			//console.log(grid);
 			groundTruth = new GroundTruth(min,max,grid,start);
 			var agentMoveX = groundTruth.getTransitionX();
 			var agentMoveY = groundTruth.getTransitionY();
 			actions = groundTruth.getAction();
 			observations = groundTruth.getSensor();
 
-			pf = new ParticleFilter(grid,10);
+			pf = new ParticleFilter(grid,500);
 			painter = new Painter("draw-div");
 			pfData = pf.getData();
-			console.log(pfData);
-			painter.drawCanvas(pfData,2,2);
+			//console.log(pfData);
+			painter.drawCanvas(pfData,10,10,pf.getActual());
 
 			
 
@@ -289,13 +289,16 @@
 		var idx = 0;
 			
 		function nextIteration() {
-			for(var i = 0 ; i < 10 ; i++) {
-				pf.nextIteration(actions[idx],observations);
+			console.log(observations);
+			for(var i = 0 ; i < 5 ; i++) {
+				pf.nextIteration(actions[idx],observations[idx]);
 				idx++;
-				painter.drawCanvas(pf.getData(),2,2);
+				//painter.drawCanvas(pf.getData(),10,10,pf.getActual());
+				setTimeout(function(){ painter.drawCanvas(pf.getData(),10,10,pf.getActual()); }, 250*i);
+				//console.log(pf.getActual());
 				//console.log(pf.getActual());
 			}
-			alert("done");
+			//alert("done");
 		}
 		
 		//download('test.txt',str);

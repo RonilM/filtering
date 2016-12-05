@@ -58,13 +58,17 @@ var ParticleFilter = function(data,nParticles) {
 	}	
 	
 	ParticleFilter.prototype.weighSamplesUsingObservation = function (observation) {
-
+		console.log(observation);
 		var observed = observation;
 		for(var i = 0; i  < nParticles ; i++) {
 			var particle = particles[i];
+			//console.log(particle);
 			var type = data[particle.cell.x][particle.cell.y].type;
+			//alert(type+"!!")
 			if(type == observed) {
 				particle.weight = 0.9;
+				console.log("@#@$#@$#$");
+				alert(data[particle.cell.x][particle.cell.y].type);
 			}
 			else {
 				particle.weight = 0.05;	
@@ -119,10 +123,11 @@ var ParticleFilter = function(data,nParticles) {
 
 				//data[i][j] = {};
 
-				//data[i][j].type = getCellType(gridData[i][j]);
+				
 				//data[i][j].color = getCellcolor(gridData[i][j]);
 				if(data[i][j] == null) {
 					data[i][j] = {};
+					data[i][j].type = 'B';
 
 				}
 

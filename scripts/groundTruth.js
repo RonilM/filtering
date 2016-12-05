@@ -36,8 +36,8 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 			i++;
 		}
 
-		console.log(num);
-		console.log(action);
+		//console.log(num);
+		//console.log(action);
 
 		// transition model		
 		for(var j = 0; j < 100; j++){
@@ -45,7 +45,7 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 			if (rand < 0.9){
 				var direction = action[j];
 			}
-			console.log('direction' + direction);
+			//console.log('direction' + direction);
 			xyval = transitionModel(x,y,direction); 
 			x = xyval[0];
 			y = xyval[1];
@@ -58,10 +58,10 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 		for (var j = 0; j < 100; j++){
 			//terrainObservations[j] = getObservation(transitionX[j],transitionY[j]);
 			grid[transitionX[j]][transitionY[j]].Type = getObservation(transitionX[j],transitionY[j]);
-			console.log(grid[transitionX[j]][transitionY[j]]);
+			//console.log(grid[transitionX[j]][transitionY[j]]);
 		}
 
-		console.log(terrainObservations);
+		//console.log(terrainObservations);
 	}
 
 	function transitionModel(x,y,direction) { 
@@ -113,7 +113,7 @@ var GroundTruth = function(minimum,maximum,grid,start) {
 			default:
 				break;
 		}
-		console.log(xy);
+		//console.log(xy);
 		return xy;
 	}
 

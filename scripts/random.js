@@ -30,7 +30,7 @@ var Random = function(rowCount, columnCount) {
 
 			var dist = getDistance(start.x,start.y,end.x,end.y);
 		}
-		while (dist < 100);
+		while (dist < 5);
 
 		return [start,end];
 
@@ -94,7 +94,7 @@ var Random = function(rowCount, columnCount) {
 
 			var dist = getDistance(start.x,start.y,end.x,end.y);
 		}
-		while (dist < 100);
+		while (dist < 5);
 
 		var tries = 0;
 		while(highwayNumber < 4 && tries < 200) {
@@ -290,7 +290,7 @@ var Random = function(rowCount, columnCount) {
 				y += b;
 
 				if(!blocks[x] || !blocks[x][y]) {
-					if(highwayCnt < 100) {
+					if(highwayCnt < 5) {
 						return null;
 					}
 					else {

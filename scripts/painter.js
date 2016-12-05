@@ -2,20 +2,20 @@ var Painter = function(canvasID) {
 
 	var xmlns = "http://www.w3.org/2000/svg";
 
-	Painter.prototype.drawCanvas = function(data,cellWidth,cellHeight) {
+	Painter.prototype.drawCanvas = function(data,cellWidth,cellHeight,actual) {
 
 		var canvasWidth = data[0].length*cellWidth;
 		var canvasHeight = data.length*cellHeight;
 
 		var canvas = document.getElementById(canvasID);
 		canvas.innerHTML = "";
-		canvas.style.width = canvasWidth*2;
-		canvas.style.height = canvasHeight*2;
+		canvas.style.width = canvasWidth*1.2;
+		canvas.style.height = canvasHeight*1.2;
 
 		var svg = document.createElementNS(xmlns,'svg');
 		svg.setAttribute("id",'painter-svg');
-		svg.setAttribute("width",canvasWidth*2);
-		svg.setAttribute("height", canvasHeight*2);
+		svg.setAttribute("width",canvasWidth*1.2);
+		svg.setAttribute("height", canvasHeight*1.2);
 		canvas.appendChild(svg);
 		
 
@@ -26,14 +26,30 @@ var Painter = function(canvasID) {
 				var x = j*cellWidth;
 				var _color;
 				var prob = data[i][j].prob;
-				if(prob > 0.2) {
+				if(i == actual.x && j == actual.y) {
+					console.log(actual);
+					_color = "0000ff";
+				}
+				else if(prob > 0.5) {
 					_color = "ff0000";
 				}
-				else if(prob > 0.02) {
-					_color = "ff4c4c";	
+				else if(prob > 0.05) {
+					_color = "ff1919";
 				}
-				else if(prob > 0.002) {
-					_color = "ff9999";
+				else if(prob > 0.0125) {
+					_color = "ff3232";
+				}
+				else if(prob > 0.00625) {
+					_color = "ff4c4c";
+				}
+				else if(prob > 0.00225) {
+					_color = "ff6666";
+				}
+				else if(prob > 0.000225) {
+					_color = "ff7f7f";	
+				}
+				else if(prob > 0.00001) {
+					_color = "ffb2b2";
 				}
 				else {
 					_color = "ffffff";
