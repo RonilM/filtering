@@ -82,7 +82,7 @@ var Board = function(canvasID,rowCount,columnCount,partialObstacleArr,highways,P
 		        if(boxStore[i] == null) {
 		        	boxStore[i] = {};
 		        }
-		        boxStore[i][j] = {'DOMElement':rect , 'Code':'1', 'x':i,'y':j};
+		        boxStore[i][j] = {'DOMElement':rect , 'Code':'1', 'x':i,'y':j ,'Type' : 'N'};
 				svg.appendChild(rect);
 
 			}
