@@ -336,7 +336,8 @@
 		}
 
 		var idx = -1;
-			
+		var iterIdx = 0;
+		var iterAdds = [10,40,50];
 		function nextIteration() {
 			
 			//console.log(pfData);
@@ -345,7 +346,7 @@
 				pf = new ParticleFilter(grid,30000,start);
 				painter = new Painter("draw-div");
 				pfData = pf.getData();
-				painter.drawCanvas(pfData,2,2,pf.getActual());
+				painter.drawCanvas(pfData,3,3,pf.getActual());
 				idx++;
 				console.log(actions);
 				console.log(observations);
@@ -353,16 +354,16 @@
 			}
 			//painter.drawCanvas(pfData,4,4,pf.getActual());
 			//console.log(observations);
-			for(var i = 0 ; i < 50 ; i++) {
+			for(var i = 0 ; i < iterAdds[iterIdx] ; i++) {
 				pf.nextIteration(actions[idx],observations[idx],transitions[idx]);
 				idx++;
 				//painter.drawCanvas(pf.getData(),10,10,pf.getActual());
 				//setTimeout(function(){ painter.drawCanvas(pf.getData(),6,6,pf.getActual()); }, 250*i);
 				//console.log(pf.getActual());
-				//console.log(pf.getActual());
+				console.log(idx+" **");
 			}
-			painter.drawCanvas(pf.getData(),2,2,pf.getActual());
-			//alert("done");
+			painter.drawCanvas(pf.getData(),3,3,pf.getActual());
+			iterIdx++;
 		}
 
 		var result;
