@@ -290,7 +290,7 @@ var Random = function(rowCount, columnCount) {
 				y += b;
 
 				if(!blocks[x] || !blocks[x][y]) {
-					if(highwayCnt < 50) {
+					if(highwayCnt < 130) {
 						return null;
 					}
 					else {

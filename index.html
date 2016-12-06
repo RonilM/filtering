@@ -65,8 +65,8 @@
 	
 	<script>
 
-		var _rows = 80;
-		var _cols = 60;
+		var _rows = 160;
+		var _cols = 120;
 		var start,goal;
 		var str = "";
 		var file = "";
@@ -342,16 +342,16 @@
 			//console.log(pfData);
 			
 			if(idx == -1) {
-				pf = new ParticleFilter(grid,16000,start);
+				pf = new ParticleFilter(grid,30000,start);
 				painter = new Painter("draw-div");
 				pfData = pf.getData();
-				painter.drawCanvas(pfData,4,4,pf.getActual());
+				painter.drawCanvas(pfData,2,2,pf.getActual());
 				idx++;
 				console.log(actions);
 				console.log(observations);
 				return;
 			}
-			painter.drawCanvas(pfData,4,4,pf.getActual());
+			//painter.drawCanvas(pfData,4,4,pf.getActual());
 			//console.log(observations);
 			for(var i = 0 ; i < 50 ; i++) {
 				pf.nextIteration(actions[idx],observations[idx],transitions[idx]);
@@ -361,7 +361,7 @@
 				//console.log(pf.getActual());
 				//console.log(pf.getActual());
 			}
-			painter.drawCanvas(pf.getData(),4,4,pf.getActual());
+			painter.drawCanvas(pf.getData(),2,2,pf.getActual());
 			//alert("done");
 		}
 
