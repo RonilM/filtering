@@ -20,6 +20,8 @@
 		<br/>
 		<button onclick="generateInputMap();"> Generate Input Map </button>
 		<button onclick="downloadInputMap();"> Download Input Map </button>
+		<button onclick="generateGroundTruthFile();"> Generate Ground Truth file </button>
+		<button onclick="downloadGroundTruthFile();"> Download Ground Truth file </button>
 		<br/>
 		<br/>
 		<div>
@@ -38,6 +40,7 @@
 		<div style=""> <label> Weight2:</label>  <input id="weight2" type="text"></div>
 		<br/> -->
 		<label>Upload Input Map:</label><input onchange="uploadInputMap();" type="file" id="fileinput" />
+		<label>Upload Ground Truth file:</label><input onchange="uploadGroundTruthFile();" type="file" id="fileinput" />
 		<button onclick="runAlgo();">Run Algorithm</button>
 		<button onclick="downloadResult();">Download Result</button>
 		<button onclick="nextIteration();">Next iteration</button>
@@ -69,6 +72,7 @@
 		var _cols = 60;
 		var start,goal;
 		var str = "";
+		var file = "";
 		var min = 1;
 		var max = 5;
 		var groundTruth,actions,observations,pf,painter,pfData,grid;
@@ -145,6 +149,20 @@
 			alert("Generated");
 		} 
 
+		function generateGroundTruthFile() {
+			groundTruth = new GroundTruth(min,max,grid,start);
+			var agentMoveX = groundTruth.getTransitionX();
+			var agentMoveY = groundTruth.getTransitionY();
+			actions = groundTruth.getAction();
+			observations = groundTruth.getSensor();
+			file = getCSV(start,agentMoveX,agentMoveY,actions,observations);
+			alert("Generated");
+		} 
+
+		function downloadGroundTruthFile() {
+			download('File'+Math.floor(Math.random()*100)+'.txt', file);
+		}
+
 		function downloadInputMap() {
 			download('Map'+Math.floor(Math.random()*100)+'.txt', str);
 		}
@@ -156,6 +174,22 @@
 			    reader.readAsText(file, "UTF-8");
 			    reader.onload = function (evt) {
 			        str = evt.target.result;
+			        console.log("Changed");
+			    }
+			    reader.onerror = function (evt) {
+			    	console.log(evt);
+			        alert("Check File!");
+			    }
+			}
+		}
+
+		function uploadGroundTruthFile() {
+			var file1 = document.getElementById("fileinput").files[0];
+			if (file1) {
+			    var reader = new FileReader();
+			    reader.readAsText(file1, "UTF-8");
+			    reader.onload = function (evt) {
+			        file = evt.target.result;
 			        console.log("Changed");
 			    }
 			    reader.onerror = function (evt) {
@@ -400,6 +434,25 @@
 			}
 
 			return retVal;
+		}
+
+		function getCSV(start,transitionX,transitionY,actions,observations) {
+			var Val = "";
+			Val += start.x+","+start.y+"\n";
+			for(var i in transitionX) {
+				Val += transitionX[i] + "," + transitionY[i]	
+				Val += "\n";
+			}
+
+			for (var i in actions) {
+				Val += actions[i] + "\n";
+			}
+
+			for (var i in observations) {
+				Val += observations[i] + "\n";
+			}
+
+			return Val;
 		}
 
 		function parseCSVFormat(str) {
