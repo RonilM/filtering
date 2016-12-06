@@ -283,7 +283,7 @@
 			board = new Board('grid-div',_rows,_cols,partialObstacles,highways,PBhighways, blockedVar);
 			
 			grid = board.getGrid();
-			console.log(grid);
+			//console.log(grid);
 			// Ground Truth Values
 			//console.log(grid);
 			
@@ -315,6 +315,9 @@
 		}
 
 		function runGTAlgo() {
+
+			//TODO: ANVI : Write code here to parse the string either from generated logic, or upload logic
+
 			groundTruth = new GroundTruth(min,max,grid,start);
 			var agentMoveX = groundTruth.getTransitionX();
 			var agentMoveY = groundTruth.getTransitionY();
