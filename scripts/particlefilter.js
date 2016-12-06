@@ -1,4 +1,4 @@
-var ParticleFilter = function(data,nParticles,start) {
+var ParticleFilter = function(data,nParticles,start,transitions) {
 
 	//var data = [];
 	var particles = [];
@@ -6,10 +6,10 @@ var ParticleFilter = function(data,nParticles,start) {
 	var actualList = [];
 	init();
 
-	ParticleFilter.prototype.nextIteration = function(action,observation) {
+	ParticleFilter.prototype.nextIteration = function(action,observation,actual) {
 		this.createSamples();
 		this.transitionSamples(action);
-		this.moveActual(action);
+		this.moveActual(actual);
 		this.weighSamplesUsingObservation(observation);
 		this.updateProbabilitiesUsingParticles();
 
@@ -19,11 +19,11 @@ var ParticleFilter = function(data,nParticles,start) {
 		return data;
 	}
 
-	ParticleFilter.prototype.moveActual = function(action) {
+	ParticleFilter.prototype.moveActual = function(_actual) {
 
-		_actual = getNextCell(action,actual.x,actual.y);
-		if(Math.random() < 0.9)
-			actual = _actual;
+		//_actual = getNextCell(action,actual.x,actual.y);
+		//if(Math.random() < 0.9)
+		actual = {'x':_actual[0],'y':_actual[1]};
 		actualList.push(actual);
 
 	}

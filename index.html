@@ -37,7 +37,7 @@
 		<div style=""> <label> Weight2:</label>  <input id="weight2" type="text"></div>
 		<br/> -->
 		<label>Upload Input Map:</label><input onchange="uploadInputMap();" type="file" id="fileinput" />
-		<label>Upload Ground Truth file:</label><input onchange="uploadGroundTruthFile();" type="file" id="fileinput" />
+		<label>Upload Ground Truth file:</label><input onchange="uploadGroundTruthFile();" type="file" id="fileinput2" />
 		
 		<button onclick="downloadResult();">Download Result</button>
 		<button onclick="nextIteration();">Next iteration</button>
@@ -77,7 +77,7 @@
 		var board;
 		var random;
 		var finalPath = [];
-		var finPathStr;
+		var finPathStr,str2,transitions;
 		random = new Random(_rows,_cols);
 		
 		var heuristicNameArray = ['Diagonal','Euclidean','MaxCoordinate','Manhattan','EuclideanSquared'];
@@ -156,13 +156,13 @@
 			var agentMoveY = groundTruth.getTransitionY();
 			actions = groundTruth.getAction();
 			observations = groundTruth.getSensor();
-			file = getCSV(start,agentMoveX,agentMoveY,actions,observations);
+			str2 = getCSV(start,agentMoveX,agentMoveY,actions,observations);
 			runGTAlgo();
 			alert("Generated");
 		} 
 
 		function downloadGroundTruthFile() {
-			download('File'+Math.floor(Math.random()*100)+'.txt', file);
+			download('File'+Math.floor(Math.random()*100)+'.txt', str2);
 		}
 
 		function downloadInputMap() {
@@ -187,12 +187,12 @@
 		}
 
 		function uploadGroundTruthFile() {
-			var file1 = document.getElementById("fileinput").files[0];
+			var file1 = document.getElementById("fileinput2").files[0];
 			if (file1) {
 			    var reader = new FileReader();
 			    reader.readAsText(file1, "UTF-8");
 			    reader.onload = function (evt) {
-			        file = evt.target.result;
+			        str2 = evt.target.result;
 			        runGTAlgo();
 			        console.log("Changed");
 			    }
@@ -317,16 +317,18 @@
 		function runGTAlgo() {
 
 			//TODO: ANVI : Write code here to parse the string either from generated logic, or upload logic
-			var _Arr = parseCSV(file);
+			var _Arr = parseCSV(str2);
 
 			console.log(_Arr);
-			groundTruth = new GroundTruth(min,max,grid,start);
-			
-			var agentMoveX = groundTruth.getTransitionX();
-			var agentMoveY = groundTruth.getTransitionY();
-
-			actions = groundTruth.getAction();
-			observations = groundTruth.getSensor();
+			//groundTruth = new GroundTruth(min,max,grid,start);
+			start = {};
+			start.x = _Arr[0][0];
+			start.y = _Arr[0][1];
+			//var agentMoveX = groundTruth.getTransitionX();
+			//var agentMoveY = groundTruth.getTransitionY();
+			transitions = _Arr[1];
+			actions = _Arr[2];//groundTruth.getAction();
+			observations = _Arr[3];
 		}
 
 		function downloadResult() {
@@ -336,18 +338,23 @@
 		var idx = -1;
 			
 		function nextIteration() {
-			pf = new ParticleFilter(grid,12000,start);
-			painter = new Painter("draw-div");
-			pfData = pf.getData();
+			
 			//console.log(pfData);
-			painter.drawCanvas(pfData,4,4,pf.getActual());
+			
 			if(idx == -1) {
+				pf = new ParticleFilter(grid,16000,start);
+				painter = new Painter("draw-div");
+				pfData = pf.getData();
+				painter.drawCanvas(pfData,4,4,pf.getActual());
 				idx++;
+				console.log(actions);
+				console.log(observations);
 				return;
 			}
+			painter.drawCanvas(pfData,4,4,pf.getActual());
 			//console.log(observations);
 			for(var i = 0 ; i < 50 ; i++) {
-				pf.nextIteration(actions[idx],observations[idx]);
+				pf.nextIteration(actions[idx],observations[idx],transitions[idx]);
 				idx++;
 				//painter.drawCanvas(pf.getData(),10,10,pf.getActual());
 				//setTimeout(function(){ painter.drawCanvas(pf.getData(),6,6,pf.getActual()); }, 250*i);
@@ -496,9 +503,10 @@
 
 		}
 
-		function parseCSV(str) {
+		function parseCSV(str2) {
 			alert("In CSV");
-			var arr = str.split("\n");
+			var arr = str2.split("\n");
+			console.log(str2+"");
 			var _start;
 			var Val = [];
 			var temp = arr[0].split(",");
