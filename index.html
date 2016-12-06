@@ -317,10 +317,14 @@
 		function runGTAlgo() {
 
 			//TODO: ANVI : Write code here to parse the string either from generated logic, or upload logic
+			var _Arr = parseCSV(file);
 
+			console.log(_Arr);
 			groundTruth = new GroundTruth(min,max,grid,start);
+			
 			var agentMoveX = groundTruth.getTransitionX();
 			var agentMoveY = groundTruth.getTransitionY();
+
 			actions = groundTruth.getAction();
 			observations = groundTruth.getSensor();
 		}
@@ -489,6 +493,39 @@
 				}
 			}
 			return retVal;
+
+		}
+
+		function parseCSV(str) {
+			alert("In CSV");
+			var arr = str.split("\n");
+			var _start;
+			var Val = [];
+			var temp = arr[0].split(",");
+			var actions = [];
+			var observations = [];
+			start = temp;
+			for (var i = 1; i <= 100; i++) {
+				Val.push(arr[i].split(","));
+			}
+
+			for(var i = 101; i <= 200; i++) {
+				actions.push(arr[i]);
+			}
+
+			for (var i = 201; i <= 300; i++){
+				observations.push(arr[i]);
+			}
+
+
+			// var grid = [];
+			// retVal.push(grid);
+			// filelength = 300;
+
+			// for(var i = 1 ; i < filelength ; i++) {
+			// 	Val.push(arr[i]);
+			// }
+			return [start,Val,actions,observations];
 
 		}
 
