@@ -50,6 +50,7 @@
 		<br/>
 	</div>
 	<div id="chart" style="position:relative;"></div>
+	<div id="chart2" style="position:relative;"></div>
 	
 	</body>
 
@@ -342,12 +343,13 @@
 		var iterIdx = 0;
 		var iterAdds = [10,40,50];
 		var chartDataPF = [];
+		var groundDataPF = [];
 		function nextIteration() {
 			
 			//console.log(pfData);
 			
 			if(idx == -1) {
-				pf = new ParticleFilter(grid,28000,start);
+				pf = new ApproxParticleFilter(grid,28000,start);
 				painter = new Painter("draw-div");
 				pfData = pf.getData();
 				painter.drawCanvas(pfData,3,3,pf.getActual());
@@ -361,13 +363,15 @@
 			var sTime  = Date.now();
 			//console.log("Start: "+sTime);
 			for(var i = 0 ; i < iterAdds[iterIdx] ; i++) {
-				var gdat = pf.nextIteration(actions[idx],observations[idx],transitions[idx]);
+				pf.nextIteration(actions[idx],observations[idx],transitions[idx]);
+				var gdat = pf.getData();
 				idx++;
 
 				var cx = pf.getActual().x;
 				var cy = pf.getActual().y;
 				var maxCell = pf.getMaxCell();
 				chartDataPF.push( Math.abs(cx - maxCell.x) + Math.abs(cy - maxCell.y) );
+				groundDataPF.push(gdat[cx][cy].prob);
 				//painter.drawCanvas(pf.getData(),10,10,pf.getActual());
 				//setTimeout(function(){ painter.drawCanvas(pf.getData(),6,6,pf.getActual()); }, 250*i);
 				//console.log(pf.getActual());
@@ -453,6 +457,27 @@
 			for(var a in arr) {
 				//var err = Math.abs(actual[a].x - result[a].x) + Math.abs(actual[a].y - result[a].y);
 				y.push(arr[a]);
+				x.push(a);
+			}
+			data.x = x;
+			data.y = y;
+			data.type = 'scatter';
+			var trace = [ data ];
+			Plotly.plot(myDiv,trace);
+
+			chartdata(groundDataPF,"chart2");
+		}
+
+		function chartdata(_data,id) {
+			var arr = chartDataPF;
+			var myDiv = document.getElementById(id);
+
+			var data = {};
+			var x = [],
+				y = [];
+			for(var a in _data) {
+				//var err = Math.abs(actual[a].x - result[a].x) + Math.abs(actual[a].y - result[a].y);
+				y.push(_data[a]);
 				x.push(a);
 			}
 			data.x = x;
