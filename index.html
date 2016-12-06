@@ -20,16 +20,13 @@
 		<br/>
 		<button onclick="generateInputMap();"> Generate Input Map </button>
 		<button onclick="downloadInputMap();"> Download Input Map </button>
+		<button onclick="generateEndpoints();">Generate Endpoints</button>
 		<button onclick="generateGroundTruthFile();"> Generate Ground Truth file </button>
 		<button onclick="downloadGroundTruthFile();"> Download Ground Truth file </button>
 		<br/>
 		<br/>
 		<div>
-			<label>Start X:</label>	<input id="startX" type="text">	
-			<label>Start Y:</label>	<input id="startY" type="text">	
-			<label>Goal X:</label>	<input id="goalX" type="text">	
-			<label>Goal Y:</label>	<input id="goalY" type="text">	
-			<button onclick="generateEndpoints();">Generate Endpoints</button>
+			
 		</div>
 		<br/>
 		<!-- <div style=""> <label> Heuristic:</label>  <input id="heuristic" type="text">	<p style="color:#607d8b">Euclidean,MaxCoordinate,Manhattan,Diagonal,EuclideanSquared</p></div>
@@ -41,7 +38,7 @@
 		<br/> -->
 		<label>Upload Input Map:</label><input onchange="uploadInputMap();" type="file" id="fileinput" />
 		<label>Upload Ground Truth file:</label><input onchange="uploadGroundTruthFile();" type="file" id="fileinput" />
-		<button onclick="runAlgo();">Run Algorithm</button>
+		
 		<button onclick="downloadResult();">Download Result</button>
 		<button onclick="nextIteration();">Next iteration</button>
 		<button onclick="runViterbi();">Run Viterbi</button>
@@ -133,29 +130,34 @@
 
 		};
 
+		
 		function generateEndpoints() {
 			var arr = random.getRandomEndPoints();
-			document.getElementById('startX').value = arr[0].x;
-			document.getElementById('startY').value = arr[0].y;
-			document.getElementById('goalX').value = arr[1].x;
-			document.getElementById('goalY').value = arr[1].y;
+			start = {};
+			goal = {};
+			start.x = arr[0].x;
+			start.y = arr[0].y;
+			goal.x = arr[1].x;
+			goal.y = arr[1].y;
 		}
-		
 
 		function generateInputMap() {
 			random = new Random(_rows,_cols);
 			map = random.getMap();
 			str = getCSVFormat(map,_rows,_cols);
+			runAlgo();
 			alert("Generated");
 		} 
 
 		function generateGroundTruthFile() {
+			
 			groundTruth = new GroundTruth(min,max,grid,start);
 			var agentMoveX = groundTruth.getTransitionX();
 			var agentMoveY = groundTruth.getTransitionY();
 			actions = groundTruth.getAction();
 			observations = groundTruth.getSensor();
 			file = getCSV(start,agentMoveX,agentMoveY,actions,observations);
+			runGTAlgo();
 			alert("Generated");
 		} 
 
@@ -174,6 +176,7 @@
 			    reader.readAsText(file, "UTF-8");
 			    reader.onload = function (evt) {
 			        str = evt.target.result;
+			        runAlgo();
 			        console.log("Changed");
 			    }
 			    reader.onerror = function (evt) {
@@ -190,6 +193,7 @@
 			    reader.readAsText(file1, "UTF-8");
 			    reader.onload = function (evt) {
 			        file = evt.target.result;
+			        runGTAlgo();
 			        console.log("Changed");
 			    }
 			    reader.onerror = function (evt) {
@@ -204,21 +208,14 @@
 			// if(ele != null){
 			// 	ele.remove();
 			// }
-			// var _retArr = parseCSVFormat(str);
-			// map = _retArr[2];
-			// _rows = _retArr[0];
-			// _cols = _retArr[1];
+			var _retArr = parseCSVFormat(str);
+			 map = _retArr[2];
+			 _rows = _retArr[0];
+			 _cols = _retArr[1];
 
+			
 
-
-			if(document.getElementById('startX').value != '' && document.getElementById('startY').value != '' && document.getElementById('goalX').value != '' &&  document.getElementById('goalY').value != '') {
-				start = {'x':parseInt(document.getElementById('startX').value), 'y':parseInt(document.getElementById('startY').value) };
-				goal = {'x':parseInt(document.getElementById('goalX').value), 'y':parseInt(document.getElementById('goalY').value) };
-			} 
-			else {
-				alert("Please provide endpoints!");
-				return;
-			}
+			
 
 			//var heuristicFunction = heuristicFn[document.getElementById('heuristic').value];
 			// if(heuristicFunction == null) {
@@ -286,19 +283,17 @@
 			board = new Board('grid-div',_rows,_cols,partialObstacles,highways,PBhighways, blockedVar);
 			
 			grid = board.getGrid();
+			console.log(grid);
 			// Ground Truth Values
 			//console.log(grid);
-			groundTruth = new GroundTruth(min,max,grid,start);
+			
+			/*groundTruth = new GroundTruth(min,max,grid,start);
 			var agentMoveX = groundTruth.getTransitionX();
 			var agentMoveY = groundTruth.getTransitionY();
 			actions = groundTruth.getAction();
-			observations = groundTruth.getSensor();
+			observations = groundTruth.getSensor();*/
 
-			pf = new ParticleFilter(grid,12000,start);
-			painter = new Painter("draw-div");
-			pfData = pf.getData();
-			//console.log(pfData);
-			painter.drawCanvas(pfData,4,4,pf.getActual());
+			
 
 			
 
@@ -319,13 +314,30 @@
 			// board.addPath(finalPath[0]);
 		}
 
+		function runGTAlgo() {
+			groundTruth = new GroundTruth(min,max,grid,start);
+			var agentMoveX = groundTruth.getTransitionX();
+			var agentMoveY = groundTruth.getTransitionY();
+			actions = groundTruth.getAction();
+			observations = groundTruth.getSensor();
+		}
+
 		function downloadResult() {
 			download('Result'+Math.floor(Math.random()*100)+'.txt', finPathStr);
 		}
 
-		var idx = 0;
+		var idx = -1;
 			
 		function nextIteration() {
+			pf = new ParticleFilter(grid,12000,start);
+			painter = new Painter("draw-div");
+			pfData = pf.getData();
+			//console.log(pfData);
+			painter.drawCanvas(pfData,4,4,pf.getActual());
+			if(idx == -1) {
+				idx++;
+				return;
+			}
 			//console.log(observations);
 			for(var i = 0 ; i < 50 ; i++) {
 				pf.nextIteration(actions[idx],observations[idx]);
