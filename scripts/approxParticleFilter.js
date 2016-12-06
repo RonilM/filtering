@@ -1,4 +1,4 @@
-var ParticleFilter = function(data,nParticles,start,transitions) {
+var ApproxParticleFilter = function(data,nParticles,start) {
 
 	//var data = [];
 	var particles = [];
@@ -7,7 +7,8 @@ var ParticleFilter = function(data,nParticles,start,transitions) {
 	var maxCell = {'prob':-1};
 	init();
 
-	ParticleFilter.prototype.nextIteration = function(action,observation,actual) {
+	ApproxParticleFilter.prototype.nextIteration = function(action,observation,actual) {
+		
 		this.createSamples();
 		this.transitionSamples(action);
 		this.moveActual(actual);
@@ -16,15 +17,15 @@ var ParticleFilter = function(data,nParticles,start,transitions) {
 
 	}	
 
-	ParticleFilter.prototype.getMaxCell = function() {
+	ApproxParticleFilter.prototype.getMaxCell = function() {
 		return maxCell;
 	}
 
-	ParticleFilter.prototype.getData = function() {
+	ApproxParticleFilter.prototype.getData = function() {
 		return data;
 	}
 
-	ParticleFilter.prototype.moveActual = function(_actual) {
+	ApproxParticleFilter.prototype.moveActual = function(_actual) {
 
 		//_actual = getNextCell(action,actual.x,actual.y);
 		//if(Math.random() < 0.9)
@@ -33,12 +34,12 @@ var ParticleFilter = function(data,nParticles,start,transitions) {
 
 	}
 	
-	ParticleFilter.prototype.getActual = function() {
+	ApproxParticleFilter.prototype.getActual = function() {
 		return actualList[actualList.length-1];
 	}
 
 
-	ParticleFilter.prototype.createSamples = function () {
+	ApproxParticleFilter.prototype.createSamples = function () {
 		particles = [];
 		for(var i = 0; i < nParticles ; i++) {
 			var rand = Math.random();
@@ -51,7 +52,7 @@ var ParticleFilter = function(data,nParticles,start,transitions) {
 
 	}
 
-	ParticleFilter.prototype.transitionSamples = function (action) {
+	ApproxParticleFilter.prototype.transitionSamples = function (action) {
 		for(var i = 0; i  < nParticles ; i++) {
 			var particle = particles[i];
 			var nxtCell = getNextCell(action,particle.cell.x,particle.cell.y);
@@ -62,7 +63,7 @@ var ParticleFilter = function(data,nParticles,start,transitions) {
 		}
 	}	
 	
-	ParticleFilter.prototype.weighSamplesUsingObservation = function (observation) {
+	ApproxParticleFilter.prototype.weighSamplesUsingObservation = function (observation) {
 		//console.log(observation);
 		var observed = observation;
 		for(var i = 0; i  < nParticles ; i++) {
@@ -80,7 +81,7 @@ var ParticleFilter = function(data,nParticles,start,transitions) {
 		}
 	}
 
-	ParticleFilter.prototype.updateProbabilitiesUsingParticles = function() {
+	ApproxParticleFilter.prototype.updateProbabilitiesUsingParticles = function() {
 
 		for(var i = 0 ; i < data.length ; i++) {
 			for(var j = 0; j < data[0].length ; j++) {
@@ -111,7 +112,7 @@ var ParticleFilter = function(data,nParticles,start,transitions) {
 
 	}
 
-	ParticleFilter.prototype.getActualList = function() {
+	ApproxParticleFilter.prototype.getActualList = function() {
 		return actualList;
 	}
 
@@ -171,10 +172,36 @@ var ParticleFilter = function(data,nParticles,start,transitions) {
 		for(var i = 0 ; i < data.length ; i++) {
 			for(var j = 0; j < data[0].length ; j++) {
 
+				//thres .000004
+				if(data[i][j].prob < 0.00004 && data[i][j].prob > 0) {
+					data[i][j].prob = 0;
+					nParticles -= nParticles/(data.length*data[0].length);
+				}
+
+				
+
+			}
+		}
+
+		var _tot = 0;
+
+		for(var i = 0 ; i < data.length ; i++) {
+			for(var j = 0; j < data[0].length ; j++) {
+				_tot += data[i][j].prob;
+			}
+		}
+
+		for(var i = 0 ; i < data.length ; i++) {
+			for(var j = 0; j < data[0].length ; j++) {
+				data[i][j].prob = data[i][j].prob/_tot;
+			}
+		}
+
+		for(var i = 0 ; i < data.length ; i++) {
+			for(var j = 0; j < data[0].length ; j++) {
 				data[i][j].probStart = end;
 				data[i][j].probEnd = data[i][j].prob + end;
 				end = data[i][j].probEnd;
-
 			}
 		}
 

@@ -41,6 +41,7 @@
 		
 		<button onclick="downloadResult();">Download Result</button>
 		<button onclick="nextIteration();">Next iteration</button>
+		<button onclick="chartPF();">Chart Particle Filter</button>
 		<button onclick="runViterbi();">Run Viterbi</button>
 
 		<!-- <button onclick="runAlgoFast();">Run Algo in Console</button> -->
@@ -60,6 +61,7 @@
 	<!-- <script type="text/javascript" src="scripts/atsar.js"></script> -->
 	<script type="text/javascript" src="scripts/groundTruth.js"></script>
 	<script type="text/javascript" src="scripts/particleFilter.js"></script>
+	<script type="text/javascript" src="scripts/approxParticleFilter.js"></script>
 	<script type="text/javascript" src="scripts/painter.js"></script>
 	<script type="text/javascript" src="scripts/viterbi.js"></script>
 	
@@ -67,6 +69,7 @@
 
 		var _rows = 160;
 		var _cols = 120;
+		var d = new Date();
 		var start,goal;
 		var str = "";
 		var file = "";
@@ -338,12 +341,13 @@
 		var idx = -1;
 		var iterIdx = 0;
 		var iterAdds = [10,40,50];
+		var chartDataPF = [];
 		function nextIteration() {
 			
 			//console.log(pfData);
 			
 			if(idx == -1) {
-				pf = new ParticleFilter(grid,30000,start);
+				pf = new ParticleFilter(grid,28000,start);
 				painter = new Painter("draw-div");
 				pfData = pf.getData();
 				painter.drawCanvas(pfData,3,3,pf.getActual());
@@ -354,9 +358,16 @@
 			}
 			//painter.drawCanvas(pfData,4,4,pf.getActual());
 			//console.log(observations);
+			var sTime  = Date.now();
+			//console.log("Start: "+sTime);
 			for(var i = 0 ; i < iterAdds[iterIdx] ; i++) {
-				pf.nextIteration(actions[idx],observations[idx],transitions[idx]);
+				var gdat = pf.nextIteration(actions[idx],observations[idx],transitions[idx]);
 				idx++;
+
+				var cx = pf.getActual().x;
+				var cy = pf.getActual().y;
+				var maxCell = pf.getMaxCell();
+				chartDataPF.push( Math.abs(cx - maxCell.x) + Math.abs(cy - maxCell.y) );
 				//painter.drawCanvas(pf.getData(),10,10,pf.getActual());
 				//setTimeout(function(){ painter.drawCanvas(pf.getData(),6,6,pf.getActual()); }, 250*i);
 				//console.log(pf.getActual());
@@ -364,7 +375,13 @@
 			}
 			painter.drawCanvas(pf.getData(),3,3,pf.getActual());
 			iterIdx++;
+			var elp = Date.now() - sTime;
+			//console.log(sTime);
+			//console.log(d.getTime());
+			console.log("Time: "+elp);
 		}
+
+
 
 		var result;
 		function runViterbi() {
@@ -417,6 +434,25 @@
 			for(var a in actual) {
 				var err = Math.abs(actual[a].x - result[a].x) + Math.abs(actual[a].y - result[a].y);
 				y.push(err);
+				x.push(a);
+			}
+			data.x = x;
+			data.y = y;
+			data.type = 'scatter';
+			var trace = [ data ];
+			Plotly.plot(myDiv,trace);
+		}
+
+		function chartPF() {
+			var arr = chartDataPF;
+			var myDiv = document.getElementById("chart");
+
+			var data = {};
+			var x = [],
+				y = [];
+			for(var a in arr) {
+				//var err = Math.abs(actual[a].x - result[a].x) + Math.abs(actual[a].y - result[a].y);
+				y.push(arr[a]);
 				x.push(a);
 			}
 			data.x = x;
